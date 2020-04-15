@@ -16,21 +16,19 @@ class CreateQuickBooksTokensTable extends Migration
     {
         Schema::create('quickbooks_tokens', function (Blueprint $table) {
             $user_id_type = DB::getSchemaBuilder()
-                              ->getColumnType('users', 'id') === 'bigint' ? 'unsignedBigInteger' : 'unsignedInteger';
-
+                              ->getColumnType(config('quickbooks.model.keys.table'), config('quickbooks.model.keys.owner')) === 'bigint' ? 'unsignedBigInteger' : 'unsignedInteger';
             $table->unsignedBigInteger('id');
-            $table->{$user_id_type}('user_id');
+            $table->{$user_id_type}(config('quickbooks.model.keys.foreign'));
             $table->unsignedBigInteger('realm_id');
             $table->longtext('access_token');
             $table->datetime('access_token_expires_at');
             $table->string('refresh_token');
             $table->datetime('refresh_token_expires_at');
-
             $table->timestamps();
 
-            $table->foreign('user_id')
-                  ->references('id')
-                  ->on('users')
+            $table->foreign(config('quickbooks.model.keys.foreign'))
+                  ->references(config('quickbooks.model.keys.owner'))
+                  ->on(config('quickbooks.model.keys.table'))
                   ->onDelete('cascade');
         });
     }
